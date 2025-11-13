@@ -12,4 +12,7 @@ public class SO_Club : ScriptableObject
 
     public int nbFlexPoint;
 
+
+    public GameObject PF_shaftSegment;
+
 }
