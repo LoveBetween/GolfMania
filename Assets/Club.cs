@@ -1,6 +1,7 @@
 using System.ComponentModel;
 using System.Net;
 using Unity.Mathematics;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class Club : MonoBehaviour
@@ -22,6 +23,13 @@ public class Club : MonoBehaviour
 
     public Vector3[] prev_flexPoints_pos;
     public Vector3[] flexPoints_pos;
+
+    public Vector3[] prev_angles;
+    public Vector3[] prev_angVel;
+    public Vector3[] angVel;
+    public Vector3[] angAcc;
+
+    public Vector3[] angMomentum;
 
     public GameObject[] shaftSegments;
 
@@ -49,7 +57,15 @@ public class Club : MonoBehaviour
         prev_flexPoints_pos = new Vector3[so_club.nbFlexPoint];
         flexPoints_pos = prev_flexPoints_pos;
 
+        //
+        prev_angles = new Vector3[so_club.nbFlexPoint];
+        prev_angVel = new Vector3[so_club.nbFlexPoint];
+        angVel = new Vector3[so_club.nbFlexPoint];
+        angAcc = new Vector3[so_club.nbFlexPoint];
+
         shaftSegments = new GameObject[so_club.nbFlexPoint + 1];
+
+        
 
         heel_pos = prev_head_pos.position + new Vector3(0, 0, head_width / 2);
         prev_hand_pos = heel_pos + new Vector3(0, this.length * math.cos(math.radians(90 - this.lie)), this.length * math.sin(math.radians(90 - this.lie)));
@@ -191,6 +207,11 @@ public class Club : MonoBehaviour
         Vector3 gravity = new Vector3(0, -9.81f, 0);
         float dt = Time.fixedDeltaTime;
 
+        float bendStiffness = 0.2f;
+        float bendDamping = 0.05f;
+
+        
+
         for (int  i = this.flexPoints_pos.Length - 1; i >= 2;i--)
         {
 
@@ -207,11 +228,22 @@ public class Club : MonoBehaviour
 
             Vector3 axis = Vector3.Cross(BA_unit,BC_unit);
 
-            
+
+            Vector3 angleVec = axis.normalized * theta;
+
+            angVel[i] = (angleVec - prev_angles[i]) / dt;
+            angAcc[i] = (angVel[i] - prev_angVel[i]) / dt;
+
+            prev_angles[i] = angleVec;
+            prev_angVel[i] = angVel[i];
+
 
             if (axis.magnitude >= 0.0001f)
             {
                 Vector3 BC_aligned = Quaternion.AngleAxis(-theta * Mathf.Rad2Deg * alpha, axis.normalized) * BC;
+
+                BC_aligned -= angVel[i] * this.stifness * dt;
+
 
                 this.flexPoints_pos[i - 2] = this.flexPoints_pos[i - 1] - BC_aligned.normalized * segmentLength;
             }
@@ -220,5 +252,72 @@ public class Club : MonoBehaviour
 
     }
 
-    
+
 }
+//    void computeFlexPointsForces()
+//    {
+//        float alpha = this.stifness;
+//        float segmentLength = length / (this.flexPoints_pos.Length - 1);
+//        Vector3 gravity = new Vector3(0, -9.81f, 0);
+//        float dt = Time.fixedDeltaTime;
+
+//        float bendStiffness = 0.2f;
+//        float bendDamping = 0.05f;
+
+//        for (int i = this.flexPoints_pos.Length - 1; i >= 2; i--)
+//        {
+
+//            Vector3 BA = this.flexPoints_pos[i] - this.flexPoints_pos[i - 1];
+//            Vector3 BC = this.flexPoints_pos[i - 1] - this.flexPoints_pos[i - 2];
+
+//            Vector3 BA_unit = BA.normalized;
+//            Vector3 BC_unit = BC.normalized;
+
+//            float cosTheta = Mathf.Clamp(Vector3.Dot(BA_unit, BC_unit), -1f, 1f);
+//            float theta = Mathf.Acos(cosTheta);
+
+//            Vector3 axis = Vector3.Cross(BA_unit, BC_unit);
+//            Vector3 angleVec = axis.normalized * theta;
+
+//            Vector3 ang = axis * theta;
+
+//            angVel[i] = (angleVec - prev_angles[i]) / dt;
+//            angAcc[i] = (angVel[i] - prev_angVel[i]) / dt;
+
+//            prev_angles[i] = angleVec;
+//            prev_angVel[i] = angVel[i];
+
+//            Vector3 torque = -ang * bendStiffness - angVel[i] * bendDamping;
+
+
+//            angMomentum[i] += torque * dt;
+
+//            // angular velocity from momentum (I = 1 for simplicity)
+//            angVel[i] = angMomentum[i];
+
+
+//            if (axis.magnitude >= 0.0001f)
+//            {
+//                this.flexPoints_pos[i - 2] += gravity * dt;
+
+//                Vector3 BC_aligned = Quaternion.AngleAxis(-theta * Mathf.Rad2Deg * alpha, axis.normalized) * BC;
+
+//                BC_aligned -= angVel[i] * this.stifness * dt;
+
+
+//                this.flexPoints_pos[i - 2] = this.flexPoints_pos[i - 1] - BC_aligned.normalized * segmentLength;
+
+//                //Quaternion dq = Quaternion.AngleAxis(
+//                //angVel[i].magnitude * Mathf.Rad2Deg * dt,
+//                //angVel[i].normalized);
+
+//                //BC = dq * BC;
+//                //flexPoints_pos[i - 2] = flexPoints_pos[i - 1] - BC.normalized * segmentLength;
+//            }
+//        }
+
+
+//    }
+
+
+//}
