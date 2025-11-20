@@ -35,7 +35,7 @@ public class Club : MonoBehaviour
 
     public Transform headObject;
 
-
+    public bool isEquiped;
 
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
@@ -81,18 +81,18 @@ public class Club : MonoBehaviour
             distFlexpoint = this.length / 4;
             segmentLength = distFlexpoint / 2;
 
-            prev_flexPoints_pos[0] = heel_pos + new Vector3(0, distFlexpoint * math.cos(math.radians(90 - this.lie)), distFlexpoint * math.sin(math.radians(90 - this.lie)));
+            prev_flexPoints_pos[0] = hand_pos - new Vector3(0, distFlexpoint * math.cos(math.radians(90 - this.lie)), distFlexpoint * math.sin(math.radians(90 - this.lie))); //heel_pos + new Vector3(0, distFlexpoint * math.cos(math.radians(90 - this.lie)), distFlexpoint * math.sin(math.radians(90 - this.lie)));
             flexPoints_pos[0] = prev_flexPoints_pos[0];
 
             shaftSegments[0] = Instantiate(so_club.PF_shaftSegment);
-            shaftSegments[0].transform.position = heel_pos + new Vector3(0, segmentLength * math.cos(math.radians(90 - this.lie)), segmentLength * math.sin(math.radians(90 - this.lie)));
+            shaftSegments[0].transform.position = hand_pos - new Vector3(0, segmentLength * math.cos(math.radians(90 - this.lie)), segmentLength * math.sin(math.radians(90 - this.lie)));//heel_pos + new Vector3(0, segmentLength * math.cos(math.radians(90 - this.lie)), segmentLength * math.sin(math.radians(90 - this.lie)));
             shaftSegments[0].transform.localScale = new Vector3(1, segmentLength, 1);
             shaftSegments[0].transform.rotation = Quaternion.Euler(90 - this.lie, 0, 0);
 
             segmentLength = (this.length - this.length / 4)/2;
 
             shaftSegments[1] = Instantiate(so_club.PF_shaftSegment);
-            shaftSegments[1].transform.position = heel_pos + new Vector3(0, segmentLength * math.cos(math.radians(90 - this.lie)), segmentLength * math.sin(math.radians(90 - this.lie))) + new Vector3(0, this.length / 4 * math.cos(math.radians(90 - this.lie)), this.length / 4 * math.sin(math.radians(90 - this.lie)));
+            shaftSegments[1].transform.position = hand_pos - new Vector3(0, segmentLength * math.cos(math.radians(90 - this.lie)), segmentLength * math.sin(math.radians(90 - this.lie))) + new Vector3(0, this.length / 4 * math.cos(math.radians(90 - this.lie)), this.length / 4 * math.sin(math.radians(90 - this.lie)));//heel_pos + new Vector3(0, segmentLength * math.cos(math.radians(90 - this.lie)), segmentLength * math.sin(math.radians(90 - this.lie))) + new Vector3(0, this.length / 4 * math.cos(math.radians(90 - this.lie)), this.length / 4 * math.sin(math.radians(90 - this.lie)));
             shaftSegments[1].transform.rotation = Quaternion.Euler(90 - this.lie, 0, 0);
             shaftSegments[1].transform.localScale = new Vector3(1, segmentLength, 1);
 
@@ -110,7 +110,7 @@ public class Club : MonoBehaviour
 
             for (int i = 0; i < so_club.nbFlexPoint; i++)
             {
-                prev_flexPoints_pos[i] = heel_pos + new Vector3(0, distFlexpoint*  math.cos(math.radians(90 - this.lie)), distFlexpoint * math.sin(math.radians(90 - this.lie)));
+                prev_flexPoints_pos[i] = hand_pos - new Vector3(0, distFlexpoint * math.cos(math.radians(90 - this.lie)), distFlexpoint * math.sin(math.radians(90 - this.lie)));//heel_pos + new Vector3(0, distFlexpoint*  math.cos(math.radians(90 - this.lie)), distFlexpoint * math.sin(math.radians(90 - this.lie)));
                 flexPoints_pos[i] = prev_flexPoints_pos[i];
 
 
@@ -155,6 +155,7 @@ public class Club : MonoBehaviour
 
 
             Gizmos.DrawLine(prev_head_pos.position + new Vector3(0, 0, head_width / 2), hand_pos);
+
         }
     }
 
@@ -164,7 +165,7 @@ public class Club : MonoBehaviour
         //Actualisation des positions
         head_pos = this.transform;
         heel_pos = prev_head_pos.position + new Vector3(0, 0, head_width / 2);
-        hand_pos = heel_pos + new Vector3(0, this.length * math.cos(math.radians(90 - this.lie)), this.length * math.sin(math.radians(90 - this.lie)));
+        hand_pos = heel_pos + new Vector3(0, this.length * math.cos(math.radians(90 - this.lie)), this.length * math.sin(math.radians(90 - this.lie))); //a modifier pour grab
         //float distFlexpoint;
 
         //if (so_club.nbFlexPoint == 1)
@@ -212,13 +213,13 @@ public class Club : MonoBehaviour
 
         
 
-        for (int  i = this.flexPoints_pos.Length - 1; i >= 2;i--)
+        for (int  i = 0; i < this.flexPoints_pos.Length - 2; i++)
         {
 
-            this.flexPoints_pos[i - 2] += gravity * dt;
+            this.flexPoints_pos[i + 2] += gravity * dt;
 
-            Vector3 BA = this.flexPoints_pos[i] - this.flexPoints_pos[i - 1];
-            Vector3 BC = this.flexPoints_pos[i-1] - this.flexPoints_pos[i - 2];
+            Vector3 BA = this.flexPoints_pos[i] - this.flexPoints_pos[i + 1];
+            Vector3 BC = this.flexPoints_pos[i+1] - this.flexPoints_pos[i + 2];
 
             Vector3 BA_unit = BA.normalized;
             Vector3 BC_unit = BC.normalized;
@@ -245,12 +246,35 @@ public class Club : MonoBehaviour
                 BC_aligned -= angVel[i] * this.stifness * dt;
 
 
-                this.flexPoints_pos[i - 2] = this.flexPoints_pos[i - 1] - BC_aligned.normalized * segmentLength;
+                this.flexPoints_pos[i + 2] = this.flexPoints_pos[i + 1] - BC_aligned.normalized * segmentLength;
             }
         }
 
 
     }
+
+    void equipClub()
+    {
+        if (isEquiped)
+        {
+            // Changer la hand_pos sur la manette
+
+            // restrict movement
+
+            // placer le joueur
+
+            isEquiped = true;
+        }
+        else
+        {
+            // lacher le club
+
+            // allow movement
+
+            isEquiped = false;  
+        }
+    }
+    
 
 
 }
