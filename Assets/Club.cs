@@ -55,13 +55,13 @@ public class Club : MonoBehaviour
         head_pos = prev_head_pos;
 
         prev_flexPoints_pos = new Vector3[so_club.nbFlexPoint];
-        flexPoints_pos = prev_flexPoints_pos;
+        flexPoints_pos = new Vector3[so_club.nbFlexPoint];
 
         //
         prev_angles = new Vector3[so_club.nbFlexPoint];
         prev_angVel = new Vector3[so_club.nbFlexPoint];
         angVel = new Vector3[so_club.nbFlexPoint];
-        angAcc = new Vector3[so_club.nbFlexPoint];
+        angMomentum = new Vector3[so_club.nbFlexPoint];
 
         shaftSegments = new GameObject[so_club.nbFlexPoint + 1];
 
@@ -128,9 +128,6 @@ public class Club : MonoBehaviour
         headObject.rotation = Quaternion.Euler(0f, 0f, loft);
         headObject.localScale = new Vector3(headObject.localScale.x,this.head_height,this.head_width);
 
-
-
-
     }
 
     private void OnDrawGizmos()
@@ -139,50 +136,35 @@ public class Club : MonoBehaviour
         {
             for (int i = 0; i < so_club.nbFlexPoint; i++)
             {
-
-                Gizmos.color = new Color(1f, 0f, 0f, 1f); // Red with custom alpha
-
-                // Draw the sphere.
+                Gizmos.color = new Color(1f, 0f, 0f, 1f);
                 Gizmos.DrawSphere(flexPoints_pos[i], 1f);
             }
-            Gizmos.color = new Color(0f, 1f, 0f, 1f); // Red with custom alpha
 
-            // Draw the sphere.
+            Gizmos.color = new Color(0f, 1f, 0f, 1f);
             Gizmos.DrawSphere(prev_hand_pos, 2f);
 
             Gizmos.color = new Color(0f, 0f, 1f, 1f);
             Gizmos.DrawSphere(prev_head_pos.position, 0.3f);
 
+            for (int i = 0; i < so_club.nbFlexPoint - 1; i++)
+            {
+                float alpha = 1f - ((float)i / (so_club.nbFlexPoint - 1));
+                Gizmos.color = new Color(1f, 1f, 0f, alpha);
+                Gizmos.DrawLine(flexPoints_pos[i], flexPoints_pos[i + 1]);
+            }
 
+            Gizmos.color = new Color(0f, 1f, 1f, 0.5f);
             Gizmos.DrawLine(prev_head_pos.position + new Vector3(0, 0, head_width / 2), hand_pos);
-
         }
     }
 
-    // Update is called once per frame
-    void Update()
+    // Use FixedUpdate for physics calculations, runs at fixed time
+    void FixedUpdate()
     {
         //Actualisation des positions
         head_pos = this.transform;
         heel_pos = prev_head_pos.position + new Vector3(0, 0, head_width / 2);
         hand_pos = heel_pos + new Vector3(0, this.length * math.cos(math.radians(90 - this.lie)), this.length * math.sin(math.radians(90 - this.lie))); //a modifier pour grab
-        //float distFlexpoint;
-
-        //if (so_club.nbFlexPoint == 1)
-        //{
-        //    distFlexpoint = this.length / 4;
-        //    flexPoints_pos[0] = heel_pos + new Vector3(0, distFlexpoint * math.cos(math.radians(90 - this.lie)), distFlexpoint * math.sin(math.radians(90 - this.lie)));
-
-        //}
-        //else if (so_club.nbFlexPoint >= 2)
-        //{
-        //    distFlexpoint = this.length / (so_club.nbFlexPoint + 1);
-        //    for (int i = 0; i < so_club.nbFlexPoint; i++)
-        //    {
-        //        flexPoints_pos[i] = heel_pos + new Vector3(0, distFlexpoint * math.cos(math.radians(90 - this.lie)), distFlexpoint * math.sin(math.radians(90 - this.lie)));
-        //        distFlexpoint += this.length / (so_club.nbFlexPoint + 1);
-        //    }
-        //}
 
         headObject.position = this.head_pos.position;
         headObject.rotation = Quaternion.Euler(0f, 0f, loft);
@@ -190,8 +172,14 @@ public class Club : MonoBehaviour
 
         //Calcul des forces
         computeFlexPointsForces();
+        Vector3 vel = (flexPoints_pos[flexPoints_pos.Length-1] - prev_flexPoints_pos[flexPoints_pos.Length-1]) / Time.fixedDeltaTime;
+        //Debug.Log(vel);
 
-
+        //sauvegarde la position des flexpoints
+        for (int i = 0; i < this.flexPoints_pos.Length; i++){
+            prev_flexPoints_pos[i] = flexPoints_pos[i];
+        }
+        // utiliser vel pour calculer la force
 
         //Verif collision
 
@@ -203,19 +191,17 @@ public class Club : MonoBehaviour
 
     void computeFlexPointsForces()
     {
-        float alpha = this.stifness;
-        float segmentLength = length / (this.flexPoints_pos.Length - 1);
+        float segmentLength = length / (this.flexPoints_pos.Length - 1); // récupérer cette quantité d'une meilleure façon
         Vector3 gravity = new Vector3(0, -9.81f, 0);
         float dt = Time.fixedDeltaTime;
+        float bendDamping = 0.05f; 
 
-        float bendStiffness = 0.2f;
-        float bendDamping = 0.05f;
-
-        
+        float maxAngle = 60f * Mathf.Deg2Rad; // angle maximum strict pour la rotation de chaque joint
+        float I = 0.1f; // ω = L/I -> avec L le moment angulaire, I le moment d'inertie, ω la vitesse angulaire
+        // I représente la résistance au mouvement angulaire, un plus petit I rend le système plus "réactif"
 
         for (int  i = 0; i < this.flexPoints_pos.Length - 2; i++)
         {
-
             this.flexPoints_pos[i + 2] += gravity * dt;
 
             Vector3 BA = this.flexPoints_pos[i] - this.flexPoints_pos[i + 1];
@@ -225,32 +211,41 @@ public class Club : MonoBehaviour
             Vector3 BC_unit = BC.normalized;
 
             float cosTheta = Mathf.Clamp(Vector3.Dot(BA_unit, BC_unit), -1f, 1f);
-            float theta = Mathf.Acos(cosTheta);
+            float theta = Mathf.Clamp(Mathf.Acos(cosTheta), -maxAngle, maxAngle);
 
             Vector3 axis = Vector3.Cross(BA_unit,BC_unit);
-
-
             Vector3 angleVec = axis.normalized * theta;
+            Vector3 ang = axis * theta;
 
             angVel[i] = (angleVec - prev_angles[i]) / dt;
-            angAcc[i] = (angVel[i] - prev_angVel[i]) / dt;
 
             prev_angles[i] = angleVec;
             prev_angVel[i] = angVel[i];
 
+            Vector3 torque = -ang * this.stifness - angVel[i] * bendDamping;
 
-            if (axis.magnitude >= 0.0001f)
+            angMomentum[i] += torque * dt;
+            angVel[i] = angMomentum[i] / I;
+
+            if (axis.magnitude >= 0.0001f) // ne pas faire de calculs lorsqu'on est "au repos"
             {
-                Vector3 BC_aligned = Quaternion.AngleAxis(-theta * Mathf.Rad2Deg * alpha, axis.normalized) * BC;
+                Vector3 BC_aligned = Quaternion.AngleAxis(angVel[i].magnitude * Mathf.Rad2Deg * dt, angVel[i].normalized) * BC;
 
                 BC_aligned -= angVel[i] * this.stifness * dt;
 
+                // Limiter l'angle final entre -maxAngle et +maxAngle
+                Vector3 newDir = BC_aligned.normalized;
+                float cosNewTheta = Mathf.Clamp(Vector3.Dot(BA_unit, newDir), -1f, 1f);
+                float newTheta = Mathf.Acos(cosNewTheta);
 
-                this.flexPoints_pos[i + 2] = this.flexPoints_pos[i + 1] - BC_aligned.normalized * segmentLength;
+                if (newTheta > maxAngle)
+                {
+                    Vector3 axisNew = Vector3.Cross(BA_unit, newDir).normalized;
+                    newDir = Quaternion.AngleAxis(maxAngle * Mathf.Rad2Deg, axisNew) * (BA_unit);
+                }
+                this.flexPoints_pos[i + 2] = this.flexPoints_pos[i + 1] - newDir * segmentLength;
             }
         }
-
-
     }
 
     void equipClub()
@@ -278,70 +273,3 @@ public class Club : MonoBehaviour
 
 
 }
-//    void computeFlexPointsForces()
-//    {
-//        float alpha = this.stifness;
-//        float segmentLength = length / (this.flexPoints_pos.Length - 1);
-//        Vector3 gravity = new Vector3(0, -9.81f, 0);
-//        float dt = Time.fixedDeltaTime;
-
-//        float bendStiffness = 0.2f;
-//        float bendDamping = 0.05f;
-
-//        for (int i = this.flexPoints_pos.Length - 1; i >= 2; i--)
-//        {
-
-//            Vector3 BA = this.flexPoints_pos[i] - this.flexPoints_pos[i - 1];
-//            Vector3 BC = this.flexPoints_pos[i - 1] - this.flexPoints_pos[i - 2];
-
-//            Vector3 BA_unit = BA.normalized;
-//            Vector3 BC_unit = BC.normalized;
-
-//            float cosTheta = Mathf.Clamp(Vector3.Dot(BA_unit, BC_unit), -1f, 1f);
-//            float theta = Mathf.Acos(cosTheta);
-
-//            Vector3 axis = Vector3.Cross(BA_unit, BC_unit);
-//            Vector3 angleVec = axis.normalized * theta;
-
-//            Vector3 ang = axis * theta;
-
-//            angVel[i] = (angleVec - prev_angles[i]) / dt;
-//            angAcc[i] = (angVel[i] - prev_angVel[i]) / dt;
-
-//            prev_angles[i] = angleVec;
-//            prev_angVel[i] = angVel[i];
-
-//            Vector3 torque = -ang * bendStiffness - angVel[i] * bendDamping;
-
-
-//            angMomentum[i] += torque * dt;
-
-//            // angular velocity from momentum (I = 1 for simplicity)
-//            angVel[i] = angMomentum[i];
-
-
-//            if (axis.magnitude >= 0.0001f)
-//            {
-//                this.flexPoints_pos[i - 2] += gravity * dt;
-
-//                Vector3 BC_aligned = Quaternion.AngleAxis(-theta * Mathf.Rad2Deg * alpha, axis.normalized) * BC;
-
-//                BC_aligned -= angVel[i] * this.stifness * dt;
-
-
-//                this.flexPoints_pos[i - 2] = this.flexPoints_pos[i - 1] - BC_aligned.normalized * segmentLength;
-
-//                //Quaternion dq = Quaternion.AngleAxis(
-//                //angVel[i].magnitude * Mathf.Rad2Deg * dt,
-//                //angVel[i].normalized);
-
-//                //BC = dq * BC;
-//                //flexPoints_pos[i - 2] = flexPoints_pos[i - 1] - BC.normalized * segmentLength;
-//            }
-//        }
-
-
-//    }
-
-
-//}

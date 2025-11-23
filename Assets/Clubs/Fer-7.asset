@@ -17,6 +17,6 @@ MonoBehaviour:
   loft: 34
   head_mass: 150
   club_name: Fer_7
-  stifness: 0.01
-  nbFlexPoint: 3
+  stifness: 0.2
+  nbFlexPoint: 4
   PF_shaftSegment: {fileID: 8114311136501578353, guid: f1d87b0a2ee2a084caf586a94c579766, type: 3}
