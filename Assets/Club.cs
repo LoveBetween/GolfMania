@@ -155,6 +155,26 @@ public class Club : MonoBehaviour
 
             Gizmos.color = new Color(0f, 1f, 1f, 0.5f);
             Gizmos.DrawLine(prev_head_pos.position + new Vector3(0, 0, head_width / 2), hand_pos);
+
+            // quad a la fin du club
+            if (so_club.nbFlexPoint >= 2)
+            {
+                Vector3 dernier = flexPoints_pos[so_club.nbFlexPoint - 1];
+                Vector3 dir = (dernier - flexPoints_pos[so_club.nbFlexPoint - 2]).normalized;
+                float size = 4f;
+                Quaternion rot = Quaternion.LookRotation(dir, Vector3.up);
+
+                Vector3 p0 = dernier + rot * new Vector3(size, size, 0);
+                Vector3 p1 = dernier + rot * new Vector3(size, -size, 0);
+                Vector3 p2 = dernier + rot * new Vector3(-size, -size, 0);
+                Vector3 p3 = dernier + rot * new Vector3(-size, size, 0);
+
+                Gizmos.color = new Color(1f, 0f, 1f, 0.5f);
+                Gizmos.DrawLine(p0, p1);
+                Gizmos.DrawLine(p1, p2);
+                Gizmos.DrawLine(p2, p3);
+                Gizmos.DrawLine(p3, p0);
+            }
         }
     }
 
