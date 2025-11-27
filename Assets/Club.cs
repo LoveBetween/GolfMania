@@ -206,6 +206,17 @@ public class Club : MonoBehaviour
         prev_head_pos = head_pos;
         // prev_flexPoints_pos = flexPoints_pos;
         prev_hand_pos = hand_pos;
+
+        heel_pos = this.flexPoints_pos[this.flexPoints_pos.Length-1];
+
+        //Vector3 lastVec = this.flexPoints_pos[this.flexPoints_pos.Length - 1] - this.flexPoints_pos[this.flexPoints_pos.Length - 2];
+
+
+        //head_pos.position = heel_pos + new Vector3(0, 0, head_width / 2);
+
+
+
+        // head_pos.rotation = Quaternion.
     }
 
 
