@@ -1,2 +1,16 @@
 fileFormatVersion: 2
 guid: c5f7681d3b5a59e4a8072952d58ea929
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - so_club: {instanceID: 0}
+  - prev_head_pos: {instanceID: 0}
+  - head_pos: {instanceID: 0}
+  - headObject: {instanceID: 0}
+  - rightHandController: {instanceID: 0}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

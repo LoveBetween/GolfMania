@@ -1,2 +1,12 @@
 fileFormatVersion: 2
 guid: f584634b27571084fbb49e7bc3bffbe3
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - PF_shaftSegment: {fileID: 8114311136501578353, guid: f1d87b0a2ee2a084caf586a94c579766, type: 3}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

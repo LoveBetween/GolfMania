@@ -2,7 +2,9 @@ using System.ComponentModel;
 using System.Net;
 using Unity.Mathematics;
 using Unity.VisualScripting;
+using Unity.XR.CoreUtils;
 using UnityEngine;
+using UnityEngine.XR.Interaction.Toolkit;
 
 public class Club : MonoBehaviour
 {
@@ -37,10 +39,20 @@ public class Club : MonoBehaviour
 
     public bool isEquiped;
 
+    public Transform rightHandController;
+
+    public float distBetweenFlexpoint;
+
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
+        isEquiped = true;
+
+        XROrigin xrOrigin = GameObject.FindAnyObjectByType<XROrigin>();
+
+        rightHandController = xrOrigin.transform.Find("Camera Offset").Find("Right Controller");
+
         //this.shaftObject = this.gameObject.transform.Find("Shaft");
         this.headObject = this.gameObject.transform.Find("Head");
 
@@ -99,14 +111,10 @@ public class Club : MonoBehaviour
         }
         else if(so_club.nbFlexPoint >= 2)
         {
+            distBetweenFlexpoint = this.length / (so_club.nbFlexPoint + 1);
             distFlexpoint = this.length / (so_club.nbFlexPoint + 1);
 
             segmentLength = distFlexpoint/2;
-
-            //shaftSegments[0] = Instantiate(so_club.PF_shaftSegment);
-            //shaftSegments[0].transform.position = heel_pos + new Vector3(0, segmentLength * math.cos(math.radians(90 - this.lie)), segmentLength * math.sin(math.radians(90 - this.lie)));
-            //shaftSegments[0].transform.localScale = new Vector3(1, segmentLength, 1);
-            //shaftSegments[0].transform.rotation = Quaternion.Euler(90 - this.lie, 0, 0);
 
             for (int i = 0; i < so_club.nbFlexPoint; i++)
             {
@@ -122,6 +130,16 @@ public class Club : MonoBehaviour
                 distFlexpoint += this.length / (so_club.nbFlexPoint + 1);
 
             }
+
+            for (int i = 0; i < so_club.nbFlexPoint; i++)
+            {
+                shaftSegments[i] = Instantiate(so_club.PF_shaftSegment);
+                shaftSegments[i].transform.position = heel_pos + new Vector3(0, segmentLength * math.cos(math.radians(90 - this.lie)), segmentLength * math.sin(math.radians(90 - this.lie)))*(i*2+1);
+                shaftSegments[i].transform.localScale = new Vector3(1, segmentLength, 1);
+                shaftSegments[i].transform.rotation = Quaternion.Euler(90 - this.lie, 0, 0);
+            }
+            shaftSegments[0].transform.localScale = new Vector3(1, segmentLength/2, 1);
+
         }
 
         headObject.position = this.head_pos.position;
@@ -177,14 +195,63 @@ public class Club : MonoBehaviour
             }
         }
     }
+    
+    // a fix
+    public void updateModel()
+    {
+        for (int i = 0; i < so_club.nbFlexPoint; i++)
+        {
+            // pas nécessaire en théorie
+            if (i == 0)
+            {
+                Vector3 dir = (hand_pos - flexPoints_pos[i]).normalized;
+                shaftSegments[i].transform.position = flexPoints_pos[i] + (dir * distBetweenFlexpoint) / (3/4);
+                shaftSegments[i].transform.rotation = Quaternion.FromToRotation(Vector3.up, dir);
+            }
+            else if(i == so_club.nbFlexPoint -1)
+            {
+                Vector3 dir = (hand_pos - flexPoints_pos[i]).normalized;
+                shaftSegments[i].transform.position = flexPoints_pos[i] + (dir * distBetweenFlexpoint) / 2;
+                shaftSegments[i].transform.rotation = Quaternion.FromToRotation(Vector3.up, dir);
+            }
+            else
+            {
+                Vector3 dir = (flexPoints_pos[i + 1] - flexPoints_pos[i]).normalized;
+                shaftSegments[i].transform.position = flexPoints_pos[i] + (dir * distBetweenFlexpoint) / 2;
+                shaftSegments[i].transform.rotation = Quaternion.FromToRotation(Vector3.up, dir);
+            }
+            
+        }
+    }
 
     // Use FixedUpdate for physics calculations, runs at fixed time
     void FixedUpdate()
     {
+
+        if (isEquiped)
+        {
+            prev_hand_pos = new Vector3(hand_pos.x, hand_pos.y, hand_pos.z);
+            hand_pos = new Vector3(rightHandController.position.x, rightHandController.position.y, rightHandController.position.z);
+
+
+            if(so_club.nbFlexPoint >=2)
+            {
+                flexPoints_pos[0] = new Vector3(hand_pos.x, hand_pos.y, hand_pos.z);
+                Vector3 dir = rightHandController.rotation*Vector3.forward ;
+                flexPoints_pos[1] = flexPoints_pos[0] + distBetweenFlexpoint * dir;
+            }
+
+            updateModel();
+        }
+        else
+        {
+            prev_hand_pos = new Vector3(hand_pos.x, hand_pos.y, hand_pos.z); 
+        }
+
         //Actualisation des positions
         head_pos = this.transform;
         heel_pos = prev_head_pos.position + new Vector3(0, 0, head_width / 2);
-        hand_pos = heel_pos + new Vector3(0, this.length * math.cos(math.radians(90 - this.lie)), this.length * math.sin(math.radians(90 - this.lie))); //a modifier pour grab
+        //hand_pos = heel_pos + new Vector3(0, this.length * math.cos(math.radians(90 - this.lie)), this.length * math.sin(math.radians(90 - this.lie))); //a modifier pour grab
 
         headObject.position = this.head_pos.position;
         headObject.rotation = Quaternion.Euler(0f, 0f, loft);
@@ -205,7 +272,8 @@ public class Club : MonoBehaviour
 
         prev_head_pos = head_pos;
         // prev_flexPoints_pos = flexPoints_pos;
-        prev_hand_pos = hand_pos;
+        
+
 
         heel_pos = this.flexPoints_pos[this.flexPoints_pos.Length-1];
 
@@ -228,7 +296,7 @@ public class Club : MonoBehaviour
         float bendDamping = 0.05f; 
 
         float maxAngle = 60f * Mathf.Deg2Rad; // angle maximum strict pour la rotation de chaque joint
-        float I = 0.1f; // ω = L/I -> avec L le moment angulaire, I le moment d'inertie, ω la vitesse angulaire
+        float I = 0.01f; // ω = L/I -> avec L le moment angulaire, I le moment d'inertie, ω la vitesse angulaire
         // I représente la résistance au mouvement angulaire, un plus petit I rend le système plus "réactif"
 
         for (int  i = 0; i < this.flexPoints_pos.Length - 2; i++)

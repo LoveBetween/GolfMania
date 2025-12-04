@@ -750,9 +750,17 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 202364687, guid: f6336ac4ac8b4d34bc5072418cdc62a0, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 1717954561962503725, guid: f6336ac4ac8b4d34bc5072418cdc62a0, type: 3}
       propertyPath: m_Name
       value: XR Origin (XR Rig)
+      objectReference: {fileID: 0}
+    - target: {fileID: 1717954561962503725, guid: f6336ac4ac8b4d34bc5072418cdc62a0, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 1717954561962503726, guid: f6336ac4ac8b4d34bc5072418cdc62a0, type: 3}
       propertyPath: m_LocalPosition.x
@@ -854,9 +862,16 @@ MonoBehaviour:
   heel_pos: {x: 0, y: 0, z: 0}
   prev_flexPoints_pos: []
   flexPoints_pos: []
+  prev_angles: []
+  prev_angVel: []
+  angVel: []
+  angAcc: []
+  angMomentum: []
   shaftSegments: []
-  shaftObject: []
   headObject: {fileID: 0}
+  isEquiped: 0
+  rightHandController: {fileID: 0}
+  distBetweenFlexpoint: 0
 --- !u!4 &1668322682
 Transform:
   m_ObjectHideFlags: 0
