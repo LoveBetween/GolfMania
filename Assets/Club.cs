@@ -75,7 +75,7 @@ public class Club : MonoBehaviour
         angVel = new Vector3[so_club.nbFlexPoint];
         angMomentum = new Vector3[so_club.nbFlexPoint];
 
-        shaftSegments = new GameObject[so_club.nbFlexPoint + 1];
+        shaftSegments = new GameObject[so_club.nbFlexPoint-1];
 
         
 
@@ -111,8 +111,8 @@ public class Club : MonoBehaviour
         }
         else if(so_club.nbFlexPoint >= 2)
         {
-            distBetweenFlexpoint = this.length / (so_club.nbFlexPoint + 1);
-            distFlexpoint = this.length / (so_club.nbFlexPoint + 1);
+            distBetweenFlexpoint = this.length / (so_club.nbFlexPoint - 1);
+            distFlexpoint = this.length / (so_club.nbFlexPoint);
 
             segmentLength = distFlexpoint/2;
 
@@ -127,18 +127,18 @@ public class Club : MonoBehaviour
                 //shaftSegments[i + 1].transform.rotation = Quaternion.Euler(90 - this.lie, 0, 0);
                 //shaftSegments[i + 1].transform.localScale = new Vector3(1, segmentLength, 1);
 
-                distFlexpoint += this.length / (so_club.nbFlexPoint + 1);
+                distFlexpoint += distBetweenFlexpoint;
 
             }
 
             for (int i = 0; i < so_club.nbFlexPoint; i++)
             {
                 shaftSegments[i] = Instantiate(so_club.PF_shaftSegment);
-                shaftSegments[i].transform.position = heel_pos + new Vector3(0, segmentLength * math.cos(math.radians(90 - this.lie)), segmentLength * math.sin(math.radians(90 - this.lie)))*(i*2+1);
-                shaftSegments[i].transform.localScale = new Vector3(1, segmentLength, 1);
+                shaftSegments[i].transform.position = heel_pos + new Vector3(0, distBetweenFlexpoint * math.cos(math.radians(90 - this.lie)), distBetweenFlexpoint * math.sin(math.radians(90 - this.lie)))*(i*2+1);
+                shaftSegments[i].transform.localScale = new Vector3(1, distBetweenFlexpoint/2, 1);
                 shaftSegments[i].transform.rotation = Quaternion.Euler(90 - this.lie, 0, 0);
             }
-            shaftSegments[0].transform.localScale = new Vector3(1, segmentLength/2, 1);
+            //shaftSegments[0].transform.localScale = new Vector3(1, segmentLength/(3/4), 1);
 
         }
 
@@ -195,33 +195,35 @@ public class Club : MonoBehaviour
             }
         }
     }
+
+    public void drawCylinder(GameObject cylinder,Vector3 startPoint, Vector3 endPoint,float length)
+    {
+        Vector3 direction = endPoint - startPoint;
+        float distance = direction.magnitude;
+        cylinder.transform.position = (startPoint + endPoint) / 2f;
+        cylinder.transform.up = direction.normalized;
+
+    }
     
     // a fix
     public void updateModel()
     {
-        for (int i = 0; i < so_club.nbFlexPoint; i++)
+        Vector3 lastSegDir = Vector3.zero;
+        for (int i = 0; i < so_club.nbFlexPoint-1; i++)
         {
-            // pas nécessaire en théorie
-            if (i == 0)
+             
+            Vector3 dir = (flexPoints_pos[i] - flexPoints_pos[i + 1]).normalized;
+            shaftSegments[i].transform.position = (flexPoints_pos[i] + flexPoints_pos[i + 1]) / 2.0f;
+            shaftSegments[i].transform.rotation = Quaternion.FromToRotation(Vector3.up, dir);
+
+            if(i == so_club.nbFlexPoint - 2)
             {
-                Vector3 dir = (hand_pos - flexPoints_pos[i]).normalized;
-                shaftSegments[i].transform.position = flexPoints_pos[i] + (dir * distBetweenFlexpoint) / (3/4);
-                shaftSegments[i].transform.rotation = Quaternion.FromToRotation(Vector3.up, dir);
+                lastSegDir = dir;
             }
-            else if(i == so_club.nbFlexPoint -1)
-            {
-                Vector3 dir = (hand_pos - flexPoints_pos[i]).normalized;
-                shaftSegments[i].transform.position = flexPoints_pos[i] + (dir * distBetweenFlexpoint) / 2;
-                shaftSegments[i].transform.rotation = Quaternion.FromToRotation(Vector3.up, dir);
-            }
-            else
-            {
-                Vector3 dir = (flexPoints_pos[i + 1] - flexPoints_pos[i]).normalized;
-                shaftSegments[i].transform.position = flexPoints_pos[i] + (dir * distBetweenFlexpoint) / 2;
-                shaftSegments[i].transform.rotation = Quaternion.FromToRotation(Vector3.up, dir);
-            }
-            
         }
+
+        this.head_pos.position = new Vector3(flexPoints_pos[flexPoints_pos.Length - 1].x, flexPoints_pos[flexPoints_pos.Length - 1].y, flexPoints_pos[flexPoints_pos.Length - 1].z);
+        this.head_pos.rotation = Quaternion.LookRotation(lastSegDir.normalized, Vector3.up);
     }
 
     // Use FixedUpdate for physics calculations, runs at fixed time
@@ -254,7 +256,7 @@ public class Club : MonoBehaviour
         //hand_pos = heel_pos + new Vector3(0, this.length * math.cos(math.radians(90 - this.lie)), this.length * math.sin(math.radians(90 - this.lie))); //a modifier pour grab
 
         headObject.position = this.head_pos.position;
-        headObject.rotation = Quaternion.Euler(0f, 0f, loft);
+        //headObject.rotation = Quaternion.Euler(0f, 0f, loft);
         headObject.localScale = new Vector3(headObject.localScale.x, this.head_height, this.head_width);
 
         //Calcul des forces
