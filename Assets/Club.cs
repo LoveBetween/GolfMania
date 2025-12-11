@@ -223,7 +223,10 @@ public class Club : MonoBehaviour
         }
 
         this.head_pos.position = new Vector3(flexPoints_pos[flexPoints_pos.Length - 1].x, flexPoints_pos[flexPoints_pos.Length - 1].y, flexPoints_pos[flexPoints_pos.Length - 1].z);
-        this.head_pos.rotation = Quaternion.LookRotation(lastSegDir.normalized, Vector3.up);
+        this.head_pos.position += new Vector3(0, head_width / 2, 0); 
+        this.head_pos.rotation = Quaternion.Euler(lie, 0, loft);
+        this.head_pos.rotation *= shaftSegments[shaftSegments.Length - 1].transform.rotation;
+        //this.head_pos.rotation = Quaternion.LookRotation(lastSegDir.normalized, Vector3.up);
     }
 
     // Use FixedUpdate for physics calculations, runs at fixed time
