@@ -30,7 +30,7 @@ public class SphereCollision : MonoBehaviour
   }
   void Update()
   {
-    if (collided) {
+    if (collided && enableDebug) {
       r.material.SetColor("_BaseColor", Color.red);
     }
     else
