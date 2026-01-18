@@ -130,8 +130,14 @@ public class SphereCollision : MonoBehaviour
 
   void ApplyClubImpact(SphereCollision other)
   {
-      SpherePhysics ballPhysics = GetComponent<SpherePhysics>();
-      test club = other.GetComponent<test>();
+      SpherePhysics ball = GetComponent<SpherePhysics>();
+      if (ball == null) return;
+
+      ManuelClub club = other.GetComponent<ManuelClub>();
+      if (club == null) return;
+
+      Debug.Log("other:" + other);
+      Debug.Log("club:" + club);
 
       Vector3 toBall = (transform.position - other.transform.position).normalized;
       float approachSpeed = Vector3.Dot(club.GetVelocity(), toBall);
@@ -139,15 +145,16 @@ public class SphereCollision : MonoBehaviour
       {
         Vector3 clubForward = other.transform.forward;
 
-        float loft = 0.35f;       // upward angle
-        float strength = 1.5f;    // power
+        // upward angle
+        float loft = 0.35f;
+        float strength = 1.5f;
 
         Vector3 hitDirection = (clubForward + Vector3.up * loft).normalized;
 
         Vector3 impulse =
             hitDirection * club.GetVelocity().magnitude * strength;
 
-        ballPhysics.AddImpulse(impulse);
+        ball.AddImpulse(impulse);
       }
   }
 

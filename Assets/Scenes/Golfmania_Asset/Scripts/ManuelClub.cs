@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class test : MonoBehaviour
+public class ManuelClub : MonoBehaviour
 {
   public float moveSpeed = 8f;
 

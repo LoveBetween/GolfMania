@@ -14,11 +14,11 @@ public class Menu : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-      if (Input.GetKeyDown(KeyCode.Tab) && !information_window.active)
+      if (Input.GetKeyDown(KeyCode.Tab) && !information_window.activeSelf)
       {
         OpenMenu();
       }
-      else if (Input.GetKeyDown(KeyCode.Tab) && information_window.active)
+      else if (Input.GetKeyDown(KeyCode.Tab) && information_window.activeSelf)
       {
         CloseButton();
       }
