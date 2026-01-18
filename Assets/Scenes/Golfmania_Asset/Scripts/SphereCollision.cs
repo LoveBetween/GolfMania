@@ -25,6 +25,7 @@ public class SphereCollision : MonoBehaviour
   }
   void FixedUpdate()
   {
+    center = transform.position;
     collided = Collided();
   }
   void Update()
@@ -83,10 +84,8 @@ public class SphereCollision : MonoBehaviour
          collisionHappend = true;
          collisionNormal = ComputeBoxNormal(sphere);
 
-            //Corriger la position pour ne pas avoir de depassement
-            // float penetration = sumRadius - dist;
-            // transform.position += collisionNormal * penetration;
-            
+
+          ApplyClubImpact(sphere);
         }
       }
       else
@@ -104,20 +103,20 @@ public class SphereCollision : MonoBehaviour
                          collisionHappend = true;
                          collisionNormal = ComputeBoxNormal(box);
 
-                      //   //Corriger la position pour ne pas avoir de depassement
-                      //    Vector3 closestPoint = new Vector3(
-                      //     Mathf.Clamp(transform.position.x, box.min_x, box.max_x),
-                      //     Mathf.Clamp(transform.position.y, box.min_y, box.max_y),
-                      //     Mathf.Clamp(transform.position.z, box.min_z, box.max_z)
-                      // );
-                      //
-                      // Vector3 diff = transform.position - closestPoint;
-                      // float dist = diff.magnitude;
-                      //
-                      // float penetration = radius - dist;
-                      //
-                      // if (penetration > 0f)
-                      //     transform.position += collisionNormal * penetration;
+                        //Corriger la position pour ne pas avoir de depassement
+                         Vector3 closestPoint = new Vector3(
+                          Mathf.Clamp(transform.position.x, box.min_x, box.max_x),
+                          Mathf.Clamp(transform.position.y, box.min_y, box.max_y),
+                          Mathf.Clamp(transform.position.z, box.min_z, box.max_z)
+                      );
+
+                      Vector3 diff = transform.position - closestPoint;
+                      float dist = diff.magnitude;
+
+                      float penetration = radius - dist;
+
+                      if (penetration > 0f)
+                          transform.position += collisionNormal * penetration;
                        }
       }
 
@@ -128,6 +127,30 @@ public class SphereCollision : MonoBehaviour
 
     return collisionHappend;
   }
+
+  void ApplyClubImpact(SphereCollision other)
+  {
+      SpherePhysics ballPhysics = GetComponent<SpherePhysics>();
+      test club = other.GetComponent<test>();
+
+      Vector3 toBall = (transform.position - other.transform.position).normalized;
+      float approachSpeed = Vector3.Dot(club.GetVelocity(), toBall);
+      if (approachSpeed > 0f)
+      {
+        Vector3 clubForward = other.transform.forward;
+
+        float loft = 0.35f;       // upward angle
+        float strength = 1.5f;    // power
+
+        Vector3 hitDirection = (clubForward + Vector3.up * loft).normalized;
+
+        Vector3 impulse =
+            hitDirection * club.GetVelocity().magnitude * strength;
+
+        ballPhysics.AddImpulse(impulse);
+      }
+  }
+
 
   private void OnDrawGizmos()
   {

@@ -15,6 +15,8 @@ public class SpherePhysics : MonoBehaviour
   public float friction = 0.5f;
   private Vector3 angularVelocity;
 
+  public float mass = 1f;
+
   void Start()
   {
       sphereCollider = GetComponent<SphereCollision>();
@@ -71,6 +73,11 @@ public class SpherePhysics : MonoBehaviour
       // Apply rotation
       transform.Rotate(angularVelocity * Mathf.Rad2Deg * Time.fixedDeltaTime,Space.World);
       //==========================================================================
+  }
+
+  public void AddImpulse(Vector3 impulse)
+  {
+      velocity += impulse / mass;
   }
 
   public Vector3 GetVelocity()
