@@ -665,6 +665,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: -8679921383154817045, guid: 79800d2eb7999914ca0e2e762fe76af3, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1380656548}
+    - targetCorrespondingSourceObject: {fileID: -8679921383154817045, guid: 79800d2eb7999914ca0e2e762fe76af3, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 473787204}
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 79800d2eb7999914ca0e2e762fe76af3, type: 3}
       insertIndex: -1
@@ -760,13 +763,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 473787201}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.13275357, y: 0.38780543, z: -0.05117762, w: -0.91069436}
-  m_LocalPosition: {x: 18.55, y: 13.71, z: -120.56}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalRotation: {x: 0.36186856, y: 0, z: 0, w: 0.93222916}
+  m_LocalPosition: {x: 0, y: 1.27, z: -0.46}
+  m_LocalScale: {x: 0.09999998, y: 0.1, z: 0.099999994}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 16.349, y: 313.784, z: -0.582}
+  m_Father: {fileID: 1610422324}
+  m_LocalEulerAnglesHint: {x: 42.43, y: 0, z: 0}
 --- !u!114 &473787205
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -931,7 +934,7 @@ Light:
   serializedVersion: 11
   m_Type: 1
   m_Color: {r: 1, g: 0.95686275, b: 0.8392157, a: 1}
-  m_Intensity: 1.32
+  m_Intensity: 2
   m_Range: 10
   m_SpotAngle: 30
   m_InnerSpotAngle: 21.80208
@@ -973,7 +976,7 @@ Light:
   m_Lightmapping: 4
   m_LightShadowCasterMode: 0
   m_AreaSize: {x: 1, y: 1}
-  m_BounceIntensity: 2
+  m_BounceIntensity: 3
   m_ColorTemperature: 6570
   m_UseColorTemperature: 0
   m_BoundingSphereOverride: {x: 0, y: 0, z: 0, w: 0}
@@ -3494,7 +3497,6 @@ PrefabInstance:
 SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
-  - {fileID: 473787204}
   - {fileID: 523786047}
   - {fileID: 1050028619}
   - {fileID: 1066256775}
