@@ -85,4 +85,14 @@ public class SpherePhysics : MonoBehaviour
     return velocity;
   }
 
+  public bool IsMoving()
+  {
+    return velocity.magnitude >= 0.25f;
+  }
+
+  public void ResetAllVelocities()
+  {
+    velocity = Vector3.zero;
+    angularVelocity = Vector3.zero;
+  }
 }

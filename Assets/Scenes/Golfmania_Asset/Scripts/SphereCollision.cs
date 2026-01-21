@@ -17,10 +17,13 @@ public class SphereCollision : MonoBehaviour
   private Vector3 collisionNormal = Vector3.zero;
 
 
+  private Gameplay_Manager gameplay_manager;
   void Start()
   {
     r = GetComponent<MeshRenderer>();
     center = transform.position;
+
+    gameplay_manager = GameObject.Find("Gameplay Manager").GetComponent<Gameplay_Manager>();
 
   }
   void FixedUpdate()
@@ -86,6 +89,8 @@ public class SphereCollision : MonoBehaviour
 
 
           ApplyClubImpact(sphere);
+          gameplay_manager.AddHit();
+          gameplay_manager.Set_LastHitTime(this.gameObject.transform.position);
         }
       }
       else
@@ -133,7 +138,7 @@ public class SphereCollision : MonoBehaviour
       SpherePhysics ball = GetComponent<SpherePhysics>();
       if (ball == null) return;
 
-      ManuelClub club = other.GetComponent<ManuelClub>();
+      ManuelClub club = other.gameObject.transform.parent.gameObject.GetComponent<ManuelClub>();
       if (club == null) return;
 
       Debug.Log("other:" + other);
@@ -141,22 +146,35 @@ public class SphereCollision : MonoBehaviour
 
       Vector3 toBall = (transform.position - other.transform.position).normalized;
       float approachSpeed = Vector3.Dot(club.GetVelocity(), toBall);
-      if (approachSpeed > 0f)
-      {
-        Vector3 clubForward = other.transform.forward;
+      if (approachSpeed <= 0f)
+          return;
 
-        // upward angle
-        float loft = 0.35f;
-        float strength = 1.5f;
+      float loft = 0.25f;
+      float strength = 7f;
 
-        Vector3 hitDirection = (clubForward + Vector3.up * loft).normalized;
+      Vector3 hitDirection = (toBall + Vector3.up * loft).normalized;
 
-        Vector3 impulse =
-            hitDirection * club.GetVelocity().magnitude * strength;
+      Vector3 impulse = hitDirection * approachSpeed * strength;
 
-        ball.AddImpulse(impulse);
-      }
-  }
+      ball.AddImpulse(impulse);
+
+
+        //if (approachSpeed > 0f)
+        //{
+        //  Vector3 clubForward = other.transform.forward;
+
+        //  // upward angle
+        //  float loft = 0.3f;
+        //  float strength = 10f;
+
+        //  Vector3 hitDirection = (clubForward + Vector3.up * loft).normalized;
+
+        //  Vector3 impulse =
+        //      hitDirection * club.GetVelocity().magnitude * strength;
+
+        //  ball.AddImpulse(impulse);
+        //}
+    }
 
 
   private void OnDrawGizmos()
