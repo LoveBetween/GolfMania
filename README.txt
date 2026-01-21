@@ -24,4 +24,4 @@ Pour afficher le club flexible, il suffit de lancer la scène.
 
 Le fichier "Clubs/Fer 7" contient le Scriptable Object permettant de fixer le nombre de flexpoints souhaité.
 
-Au lancement, comme nous n'avons plus la fonctionnalité VR, il faut manuellement modifier les valeurs de position dans le tableau flex_point de l'inspecteur à droite.
+Au lancement, il faut manuellement modifier les valeurs de position dans le tableau flex_point de l'inspecteur à droite.
