@@ -2,6 +2,8 @@ Lien git vers les sources du projet Unity:
 
 https://github.com/LoveBetween/GolfMania.git
 
+Executable sur la machine du VirtualLab : D:\M2_AIDN\Golfmania\Build
+
 Il contient 3 scènes : la scène "Start Menu" qui contient le menu principal scène "Golfmania" qui contient la démo et la scène "SampleScene" qui contient le club avec les flexpoints.
 
 Pour chaque scène, il est possible d'appuier sur la touche "échap" pour revenir au menu principal.
