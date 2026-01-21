@@ -4,7 +4,7 @@ https://github.com/LoveBetween/GolfMania.git
 
 Il contient 3 scènes : la scène "Start Menu" qui contient le menu principal scène "Golfmania" qui contient la démo et la scène "SampleScene" qui contient le club avec les flexpoints.
 
-Pour chaque scène, c'est possible d'appuie sur la touche "échap" pour revenir au menu principal.
+Pour chaque scène, il est possible d'appuier sur la touche "échap" pour revenir au menu principal.
 
 Start Menu:
 
