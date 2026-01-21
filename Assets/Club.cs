@@ -148,53 +148,53 @@ public class Club : MonoBehaviour
 
     }
 
-    private void OnDrawGizmos()
-    {
-        if (Application.isPlaying)
-        {
-            for (int i = 0; i < so_club.nbFlexPoint; i++)
-            {
-                Gizmos.color = new Color(1f, 0f, 0f, 1f);
-                Gizmos.DrawSphere(flexPoints_pos[i], 1f);
-            }
+    //private void OnDrawGizmos()
+    //{
+    //    if (Application.isPlaying)
+    //    {
+    //        for (int i = 0; i < so_club.nbFlexPoint; i++)
+    //        {
+    //            Gizmos.color = new Color(1f, 0f, 0f, 1f);
+    //            Gizmos.DrawSphere(flexPoints_pos[i], 1f);
+    //        }
 
-            Gizmos.color = new Color(0f, 1f, 0f, 1f);
-            Gizmos.DrawSphere(prev_hand_pos, 2f);
+    //        Gizmos.color = new Color(0f, 1f, 0f, 1f);
+    //        Gizmos.DrawSphere(prev_hand_pos, 2f);
 
-            Gizmos.color = new Color(0f, 0f, 1f, 1f);
-            Gizmos.DrawSphere(prev_head_pos.position, 0.3f);
+    //        Gizmos.color = new Color(0f, 0f, 1f, 1f);
+    //        Gizmos.DrawSphere(prev_head_pos.position, 0.3f);
 
-            for (int i = 0; i < so_club.nbFlexPoint - 1; i++)
-            {
-                float alpha = 1f - ((float)i / (so_club.nbFlexPoint - 1));
-                Gizmos.color = new Color(1f, 1f, 0f, alpha);
-                Gizmos.DrawLine(flexPoints_pos[i], flexPoints_pos[i + 1]);
-            }
+    //        for (int i = 0; i < so_club.nbFlexPoint - 1; i++)
+    //        {
+    //            float alpha = 1f - ((float)i / (so_club.nbFlexPoint - 1));
+    //            Gizmos.color = new Color(1f, 1f, 0f, alpha);
+    //            Gizmos.DrawLine(flexPoints_pos[i], flexPoints_pos[i + 1]);
+    //        }
 
-            Gizmos.color = new Color(0f, 1f, 1f, 0.5f);
-            Gizmos.DrawLine(prev_head_pos.position + new Vector3(0, 0, head_width / 2), hand_pos);
+    //        Gizmos.color = new Color(0f, 1f, 1f, 0.5f);
+    //        Gizmos.DrawLine(prev_head_pos.position + new Vector3(0, 0, head_width / 2), hand_pos);
 
-            // quad a la fin du club
-            if (so_club.nbFlexPoint >= 2)
-            {
-                Vector3 dernier = flexPoints_pos[so_club.nbFlexPoint - 1];
-                Vector3 dir = (dernier - flexPoints_pos[so_club.nbFlexPoint - 2]).normalized;
-                float size = 4f;
-                Quaternion rot = Quaternion.LookRotation(dir, Vector3.up);
+    //        // quad a la fin du club
+    //        if (so_club.nbFlexPoint >= 2)
+    //        {
+    //            Vector3 dernier = flexPoints_pos[so_club.nbFlexPoint - 1];
+    //            Vector3 dir = (dernier - flexPoints_pos[so_club.nbFlexPoint - 2]).normalized;
+    //            float size = 4f;
+    //            Quaternion rot = Quaternion.LookRotation(dir, Vector3.up);
 
-                Vector3 p0 = dernier + rot * new Vector3(size, size, 0);
-                Vector3 p1 = dernier + rot * new Vector3(size, -size, 0);
-                Vector3 p2 = dernier + rot * new Vector3(-size, -size, 0);
-                Vector3 p3 = dernier + rot * new Vector3(-size, size, 0);
+    //            Vector3 p0 = dernier + rot * new Vector3(size, size, 0);
+    //            Vector3 p1 = dernier + rot * new Vector3(size, -size, 0);
+    //            Vector3 p2 = dernier + rot * new Vector3(-size, -size, 0);
+    //            Vector3 p3 = dernier + rot * new Vector3(-size, size, 0);
 
-                Gizmos.color = new Color(1f, 0f, 1f, 0.5f);
-                Gizmos.DrawLine(p0, p1);
-                Gizmos.DrawLine(p1, p2);
-                Gizmos.DrawLine(p2, p3);
-                Gizmos.DrawLine(p3, p0);
-            }
-        }
-    }
+    //            Gizmos.color = new Color(1f, 0f, 1f, 0.5f);
+    //            Gizmos.DrawLine(p0, p1);
+    //            Gizmos.DrawLine(p1, p2);
+    //            Gizmos.DrawLine(p2, p3);
+    //            Gizmos.DrawLine(p3, p0);
+    //        }
+    //    }
+    //}
 
     public void drawCylinder(GameObject cylinder,Vector3 startPoint, Vector3 endPoint,float length)
     {
