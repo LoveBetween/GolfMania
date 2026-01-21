@@ -2,12 +2,15 @@ using UnityEngine;
 using Unity.XR.CoreUtils;
 using UnityEngine.XR.Interaction.Toolkit;
 
+//Manettes
 public class ManuelClub : MonoBehaviour
 {
     public Transform rightHandController;
     public Vector3 rotationOffsetEuler;
     private Vector3 lastPosition;
     private Vector3 velocity;
+
+    public GameFinished gameFinished;
 
     void Start()
     {
@@ -18,24 +21,27 @@ public class ManuelClub : MonoBehaviour
 
     void Update()
     {
-        transform.position = rightHandController.position;
+        if (!gameFinished.isGameFinished)
+        {
+            transform.position = rightHandController.position;
 
-        Vector3 up = -rightHandController.forward;
+            Vector3 up = -rightHandController.forward;
 
-        Vector3 right = Vector3.Cross(rightHandController.up, up).normalized;
-        Vector3 forward = Vector3.Cross(up, right);
+            Vector3 right = Vector3.Cross(rightHandController.up, up).normalized;
+            Vector3 forward = Vector3.Cross(up, right);
 
-        transform.rotation = Quaternion.LookRotation(forward, up);
+            transform.rotation = Quaternion.LookRotation(forward, up);
 
-        transform.rotation *= Quaternion.Euler(rotationOffsetEuler);
+            transform.rotation *= Quaternion.Euler(rotationOffsetEuler);
 
-        velocity = (rightHandController.position - lastPosition) / Time.deltaTime;
-        lastPosition = rightHandController.position;
-        //velocity = (transform.position - lastPosition) / Time.deltaTime;
-        //lastPosition = transform.position;
-        Debug.DrawRay(transform.position, transform.up, Color.green);      // UP du club
-        Debug.DrawRay(transform.position, rightHandController.forward, Color.blue); // Raycast controller
-        Debug.DrawRay(transform.position, velocity, Color.red);           // Velocity
+            velocity = (rightHandController.position - lastPosition) / Time.deltaTime;
+            lastPosition = rightHandController.position;
+        }
+        else
+        {
+            transform.position = new Vector3(-1000, 0, -1000);
+        }
+
     }
 
     public Vector3 GetVelocity()
@@ -44,6 +50,7 @@ public class ManuelClub : MonoBehaviour
     }
 }
 
+//Clavier
 //public class ManuelClub : MonoBehaviour
 //{
 //  public float moveSpeed = 8f;

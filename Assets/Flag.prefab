@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 5801972601745864309}
   - component: {fileID: 412824014703314693}
   - component: {fileID: 8804325829374951775}
-  - component: {fileID: 1905275417162515905}
+  - component: {fileID: 7758724957524646462}
   m_Layer: 0
   m_Name: trou
   m_TagString: Untagged
@@ -87,29 +87,19 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!136 &1905275417162515905
-CapsuleCollider:
+--- !u!114 &7758724957524646462
+MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 881396483887484437}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
   m_Enabled: 1
-  serializedVersion: 2
-  m_Radius: 0.5000001
-  m_Height: 2
-  m_Direction: 1
-  m_Center: {x: 0.000000059604645, y: 0, z: -0.00000008940697}
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a37dcad858a4c414babe984b20589365, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  golfBall: {fileID: 0}
 --- !u!1 &8886340142171956785
 GameObject:
   m_ObjectHideFlags: 0

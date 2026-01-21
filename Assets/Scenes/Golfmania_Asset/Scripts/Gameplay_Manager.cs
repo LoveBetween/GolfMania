@@ -69,4 +69,9 @@ public class Gameplay_Manager : MonoBehaviour
     {
         this.lastHitPosition = pos;
     }
+
+    public void StopGame()
+    {
+        spherePhysics.ResetAllVelocities();
+    }
 }
